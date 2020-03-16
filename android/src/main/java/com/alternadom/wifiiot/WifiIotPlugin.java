@@ -732,7 +732,11 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
     private Boolean connectTo(String ssid, String password, String security, Boolean joinOnce) {
         /// Make new configuration
         WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = "\"" + ssid + "\"";
+//        conf.SSID = "\"" + ssid + "\"";
+
+        conf.SSID = "\"".concat(ssid).concat("\"");
+        conf.status = WifiConfiguration.Status.DISABLED;
+        conf.priority = 40;
 
         if (security != null) security = security.toUpperCase();
         else security = "NONE";
