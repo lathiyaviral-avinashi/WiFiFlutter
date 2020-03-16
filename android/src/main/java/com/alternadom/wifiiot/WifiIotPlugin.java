@@ -21,6 +21,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.provider.SyncStateContract;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -48,6 +49,9 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.PluginRegistry.ViewDestroyListener;
 import io.flutter.view.FlutterNativeView;
+
+import static android.net.wifi.WifiConfiguration.AuthAlgorithm.OPEN;
+import static android.net.wifi.WifiConfiguration.Protocol.WPA;
 
 /**
  * WifiIotPlugin
@@ -735,33 +739,98 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
 
         if (security.toUpperCase().equals("WPA")) {
 
+
+            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+
+            conf.preSharedKey = "\"" + ssid + "\"";
+
             /// appropriate ciper is need to set according to security type used,
             /// ifcase of not added it will not be able to connect
             conf.preSharedKey = "\"" + password + "\"";
 
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
 
-            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//            conf.allowedKeyManagement.set(4);
 
             conf.status = WifiConfiguration.Status.ENABLED;
 
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
 
-            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
 
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
 
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            conf.allowedProtocols.set(WPA);
         } else if (security.equals("WEP")) {
             conf.wepKeys[0] = "\"" + password + "\"";
             conf.wepTxKeyIndex = 0;
+//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+
             conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
             conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+
+            if (ssid.matches("^[0-9a-fA-F]+$")) {
+                conf.wepKeys[0] = ssid;
+            } else {
+                conf.wepKeys[0] = "\"".concat(ssid).concat("\"");
+            }
+
+            conf.wepTxKeyIndex = 0;
         } else {
+//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            conf.allowedAuthAlgorithms.clear();
+            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+        }
+
+
+        int networkID = moWiFi.addNetwork(conf);
+
+        Log.v("rht", "Add result " + networkID);
+
+        List<WifiConfiguration> list = moWiFi.getConfiguredNetworks();
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
+                Log.v("rht", "WifiConfiguration SSID " + i.SSID);
+
+                boolean isDisconnected = moWiFi.disconnect();
+                Log.v("rht", "isDisconnected : " + isDisconnected);
+
+                boolean isEnabled = moWiFi.enableNetwork(i.networkId, true);
+                Log.v("rht", "isEnabled : " + isEnabled);
+
+                boolean isReconnected = moWiFi.reconnect();
+                Log.v("rht", "isReconnected : " + isReconnected);
+
+                break;
+            }
         }
 
         /// Remove the existing configuration for this netwrok
