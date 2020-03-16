@@ -821,12 +821,23 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
         }
 
 
+        int networkId = moWiFi.addNetwork(conf);
+
+        Log.v("rht", "Add result " + networkId);
+
         List<WifiConfiguration> list = moWiFi.getConfiguredNetworks();
-        for( WifiConfiguration i : list ) {
-            if(i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
-                moWiFi.disconnect();
-                moWiFi.enableNetwork(i.networkId, true);
-                moWiFi.reconnect();
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
+                Log.v("rht", "WifiConfiguration SSID " + i.SSID);
+
+                boolean isDisconnected = moWiFi.disconnect();
+                Log.v("rht", "isDisconnected : " + isDisconnected);
+
+                boolean isEnabled = moWiFi.enableNetwork(i.networkId, true);
+                Log.v("rht", "isEnabled : " + isEnabled);
+
+                boolean isReconnected = moWiFi.reconnect();
+                Log.v("rht", "isReconnected : " + isReconnected);
 
                 break;
             }
