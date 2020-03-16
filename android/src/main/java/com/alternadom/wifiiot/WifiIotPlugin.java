@@ -820,29 +820,6 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
             conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
         }
 
-
-        int networkId = moWiFi.addNetwork(conf);
-
-        Log.v("rht", "Add result " + networkId);
-
-        List<WifiConfiguration> list = moWiFi.getConfiguredNetworks();
-        for (WifiConfiguration i : list) {
-            if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
-                Log.v("rht", "WifiConfiguration SSID " + i.SSID);
-
-                boolean isDisconnected = moWiFi.disconnect();
-                Log.v("rht", "isDisconnected : " + isDisconnected);
-
-                boolean isEnabled = moWiFi.enableNetwork(i.networkId, true);
-                Log.v("rht", "isEnabled : " + isEnabled);
-
-                boolean isReconnected = moWiFi.reconnect();
-                Log.v("rht", "isReconnected : " + isReconnected);
-
-                break;
-            }
-        }
-
         /// Remove the existing configuration for this netwrok
         List<WifiConfiguration> mWifiConfigList = moWiFi.getConfiguredNetworks();
 
@@ -875,6 +852,29 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
         if (!disconnect) {
             return false;
         }
+
+        int networkID = moWiFi.addNetwork(conf);
+
+        Log.v("rht", "Add result " + networkID);
+
+        List<WifiConfiguration> list = moWiFi.getConfiguredNetworks();
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + ssid + "\"")) {
+                Log.v("rht", "WifiConfiguration SSID " + i.SSID);
+
+                boolean isDisconnected = moWiFi.disconnect();
+                Log.v("rht", "isDisconnected : " + isDisconnected);
+
+                boolean isEnabled = moWiFi.enableNetwork(i.networkId, true);
+                Log.v("rht", "isEnabled : " + isEnabled);
+
+                boolean isReconnected = moWiFi.reconnect();
+                Log.v("rht", "isReconnected : " + isReconnected);
+
+                break;
+            }
+        }
+
 
         Log.i("ASDF", Thread.currentThread().getName());
 
