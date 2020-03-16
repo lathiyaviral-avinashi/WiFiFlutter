@@ -754,6 +754,8 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
             conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
             conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
 
+            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+
             conf.preSharedKey = "\"" + ssid + "\"";
 
             /// appropriate ciper is need to set according to security type used,
