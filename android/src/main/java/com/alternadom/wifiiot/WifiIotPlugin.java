@@ -741,80 +741,89 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
         if (security != null) security = security.toUpperCase();
         else security = "NONE";
 
-        if (security.toUpperCase().equals("WPA")) {
+        conf.SSID = String.format("\"%s\"", ssid);
+        conf.preSharedKey = String.format("\"%s\"", password);
 
 
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+        int netId = moWiFi.addNetwork(conf);
+        moWiFi.disconnect();
+        moWiFi.enableNetwork(netId, true);
+        moWiFi.reconnect();
 
-            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-
-            conf.preSharedKey = "\"" + ssid + "\"";
-
-            /// appropriate ciper is need to set according to security type used,
-            /// ifcase of not added it will not be able to connect
-            conf.preSharedKey = "\"" + password + "\"";
-
+//        if (security.toUpperCase().equals("WPA")) {
+//
+//
 //            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
 //            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-//            conf.allowedKeyManagement.set(4);
-
-            conf.status = WifiConfiguration.Status.ENABLED;
-
-//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-
-//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-
-//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
 //            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-
-//            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-            conf.allowedProtocols.set(WPA);
-        } else if (security.equals("WEP")) {
-            conf.wepKeys[0] = "\"" + password + "\"";
-            conf.wepTxKeyIndex = 0;
-//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
 //            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-
-            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-
-            if (ssid.matches("^[0-9a-fA-F]+$")) {
-                conf.wepKeys[0] = ssid;
-            } else {
-                conf.wepKeys[0] = "\"".concat(ssid).concat("\"");
-            }
-
-            conf.wepTxKeyIndex = 0;
-        } else {
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+//
+//            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+//
+//            conf.preSharedKey = "\"" + ssid + "\"";
+//
+//            /// appropriate ciper is need to set according to security type used,
+//            /// ifcase of not added it will not be able to connect
+//            conf.preSharedKey = "\"" + password + "\"";
+//
+////            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//
+////            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+////            conf.allowedKeyManagement.set(4);
+//
+//            conf.status = WifiConfiguration.Status.ENABLED;
+//
+////            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+////            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//
+////            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+//
+////            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+////            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+//
+////            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//            conf.allowedProtocols.set(WPA);
+//        } else if (security.equals("WEP")) {
+//            conf.wepKeys[0] = "\"" + password + "\"";
+//            conf.wepTxKeyIndex = 0;
+////            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+////            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+//
 //            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-            conf.allowedAuthAlgorithms.clear();
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-        }
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+//            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+//            conf.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+//
+//            if (ssid.matches("^[0-9a-fA-F]+$")) {
+//                conf.wepKeys[0] = ssid;
+//            } else {
+//                conf.wepKeys[0] = "\"".concat(ssid).concat("\"");
+//            }
+//
+//            conf.wepTxKeyIndex = 0;
+//        } else {
+////            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+//            conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+//            conf.allowedAuthAlgorithms.clear();
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+//            conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+//            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+//        }
 
 
         int networkID = moWiFi.addNetwork(conf);
