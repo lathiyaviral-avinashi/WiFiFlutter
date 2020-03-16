@@ -735,7 +735,7 @@ public class WifiIotPlugin implements MethodCallHandler, EventChannel.StreamHand
 //        conf.SSID = "\"" + ssid + "\"";
 
         conf.SSID = "\"".concat(ssid).concat("\"");
-        conf.status = WifiConfiguration.Status.DISABLED;
+        conf.status = WifiConfiguration.Status.ENABLED;
         conf.priority = 40;
 
         conf.SSID = "\"" + ssid + "\"";
